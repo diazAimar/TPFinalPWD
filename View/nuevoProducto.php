@@ -1,27 +1,36 @@
-<?php include_once '../config.php' ?>
+<?php include_once '../config.php';
 
-<?php $title = (isset(data_submitted()['id'])) ? 'Modificar Producto' : 'Nuevo Producto';
+$data = data_submitted();
+
+$title = (isset($data['id'])) ? 'Modificar Producto' : 'Nuevo Producto';
 include_once 'includes/head.php';
 include_once 'includes/navbar.php';
 
-$data = data_submitted();
-if (isset($data['id'])) {
-  $ambProducto = new AbmProducto();
-  $producto = $ambProducto->buscar(['idproducto' => $data['id']]);
-  $producto = (count($producto) > 0) ? $producto[0] : null;
-  $proDetalles = json_decode($producto->getProDetalle(), true);
-  $dirImg = md5($data["id"]);
-  $arrImagenes = scandir($ROOT . "view/img/Productos/" . $dirImg);
-}
+$control = new NuevoProductoControl();
 
+if (isset($data['id'])) {
+  $producto = $control->productoActual($data);
+  $proDetalles = $control->proDetalles($producto);
+  $arrImagenes = $control->imagenesProducto($data);
+}
 ?>
 
 
+<!-- NOTIFICACION -->
+<?php if (isset($data['m'])) { ?>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <?= $control->mensajes($data['m']) ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+<?php } ?>
+
+
+<!-- FORMULARIO -->
 <div class="container d-flex justify-content-center align-items-start text-center mt-20vh">
 
   <?php if ($sesion->getRolActual() == 2) { ?>
 
-    <form id="formulario-nuevo-producto" novalidate class="w-100 p-4 needs-validation" enctype="multipart/form-data" action="nuevoProductoAccion.php" method="post">
+    <form id="formulario-nuevo-producto" novalidate class="w-100 p-4 needs-validation" enctype="multipart/form-data" action="accion/nuevoProductoAccion.php" method="post">
 
       <h1 class="pb-3 text-primary"><?= (isset($producto)) ? 'Editar Producto' : 'Nuevo Producto'; ?></h1>
 
@@ -29,6 +38,7 @@ if (isset($data['id'])) {
         <input id="idproducto" name="idproducto" type="hidden" value="<?= $data['id'] ?>">
       <?php } ?>
 
+      <!-- Marca - Modelo -->
       <div class="row g-4">
         <div class="col-md">
           <div class="form-floating mb-3">
@@ -45,6 +55,7 @@ if (isset($data['id'])) {
         </div>
       </div>
 
+      <!-- Precio - Precio Oferta -->
       <div class="row g-4">
         <div class="col-md">
           <div class="form-floating mb-3">
@@ -61,6 +72,7 @@ if (isset($data['id'])) {
         </div>
       </div>
 
+      <!-- Stock -->
       <div class="row g-4">
         <div class="col-md">
           <div class="form-floating mb-3">
@@ -70,6 +82,7 @@ if (isset($data['id'])) {
         </div>
       </div>
 
+      <!-- Descripciones -->
       <div class="form-floating mb-3">
         <textarea class="form-control" name="prodetalle[desc1]" placeholder="Sinopsis" id="prodetalle[desc1]" style="height: 100px; resize: none;" required><?= (isset($producto)) ? $proDetalles['desc1'] : null ?></textarea>
         <label for="prodetalle[desc1]">Primer descripción</label>
@@ -80,7 +93,7 @@ if (isset($data['id'])) {
         <label for="prodetalle[desc2]">Segunda descripción</label>
       </div>
 
-
+      <!-- Imagenes -->
       <div class="form-group mb-3 mt-5">
         <label for="imagen" class="form-label">
           <h5>Imagenes del Producto</h5>
@@ -90,7 +103,6 @@ if (isset($data['id'])) {
         <small class="form-text text-muted pb-4">(maximo 20M)</small> <br>
 
         <?php if (isset($producto)) { ?>
-
 
           <div id="contenedor-imagenes">
             <?php foreach ($arrImagenes as $imagen) { ?>
@@ -103,7 +115,7 @@ if (isset($data['id'])) {
 
             <?php if (count($arrImagenes) > 2) { ?>
               <br>
-              <a type="button" href="../Controller/borrarImagenes.php?id=<?=$producto->getIdProducto()?>" class="btn btn-labeled btn-danger mt-3" onclick="requerirImagen()" rel="nofollow" target="_blank">
+              <a type="button" href="accion/borrarImagenes.php?id=<?= $producto->getIdProducto() ?>" class="btn btn-labeled btn-danger mt-3" onclick="requerirImagen()" rel="nofollow" target="_blank">
                 <span class="btn-label"><i class="fa fa-trash"></i>&nbsp;&nbsp;&nbsp;Borrar imagenes</span>
               </a>
             <?php } ?>
@@ -114,7 +126,7 @@ if (isset($data['id'])) {
         <?php } ?>
       </div>
 
-
+      <!-- Caracteristicas Técnicas -->
       <div class="form-group mt-5">
         <label for="imagen" class="form-label">
           <h5>Caracteristicas Técnicas</h5>
@@ -125,7 +137,7 @@ if (isset($data['id'])) {
         <input type="text" value="<?= (isset($producto)) ? $proDetalles['Celular Liberado'] : null ?>" name="prodetalle[Celular Liberado]" class="form-control mb-3" id="liberado" placeholder="Liberado" required>
       </div>
 
-
+      <!-- Otras Caracteristicas -->
       <div class="form-group mt-4" id="masCaracteristicas">
         <label for="imagen" class="form-label">
           <div class="d-flex">
@@ -167,20 +179,11 @@ if (isset($data['id'])) {
 
 </div>
 
-<script>
-  function requerirImagen() {
-    let inputImagen = document.querySelectorAll("#imagen")[0];
-    inputImagen.setAttribute("required", '');
-
-    let imagenes = document.querySelectorAll("#contenedor-imagenes")[0];
-    imagenes.classList.add("d-none");
-
-  }
-</script>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
 <script src="js/addCaracteristica.js"></script>
+<script src="js/requerirImagen.js"></script>
 <script src="js/validation.js"></script>
 
 <?php include_once 'includes/footer.php' ?>

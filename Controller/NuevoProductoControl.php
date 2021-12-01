@@ -1,50 +1,50 @@
 <?php
 class NuevoProductoControl {
 
-  function procesarData() {
-    $data = data_submitted();
+  private function procesarDatos($datosProd) {
 
-    if (isset($data['prodetalleC']) && isset($data['prodetalleD'])) {
-      $data['prodetalle2'] = array_combine($data['prodetalleC'], $data['prodetalleD']);
-      unset($data['prodetalleC']);
-      unset($data['prodetalleD']);
-      $data['prodetalle'] = array_merge($data['prodetalle'], $data['prodetalle2']);
-      unset($data['prodetalle2']);
+    if (isset($datosProd['prodetalleC']) && isset($datosProd['prodetalleD'])) {
+      $datosProd['prodetalle2'] = array_combine($datosProd['prodetalleC'], $datosProd['prodetalleD']);
+      unset($datosProd['prodetalleC']);
+      unset($datosProd['prodetalleD']);
+      $datosProd['prodetalle'] = array_merge($datosProd['prodetalle'], $datosProd['prodetalle2']);
+      unset($datosProd['prodetalle2']);
     }
 
-    if (isset($data['prodetalle'])) {
-      $data['prodetalle'] = json_encode($data['prodetalle']);
+    if (isset($datosProd['prodetalle'])) {
+      $datosProd['prodetalle'] = json_encode($datosProd['prodetalle']);
     }
 
-    return $data;
+    return $datosProd;
   }
 
-  function modificarProducto($data) {
+  private function modificarProducto($datosProd) {
     $ambProducto = new AbmProducto();
-    if ($ambProducto->buscar(['idproducto' => $data['idproducto']])) {
-      $data['prodeshabilitado'] = null;
-      $exito = $ambProducto->modificacion($data);
+    if ($ambProducto->buscar(['idproducto' => $datosProd['idproducto']])) {
+      $datosProd['prodeshabilitado'] = null;
+      $exito = $ambProducto->modificacion($datosProd);
     } else {
-      $exito = 'Este producto no existe';
+      $exito = 2;
     }
     return $exito;
   }
 
-  function agregarProducto($data) {
+  private function agregarProducto($datosProd) {
     $ambProducto = new AbmProducto();
-    if (!$ambProducto->buscar(['pronombre' => $data['pronombre']])) {
-      $data['prodeshabilitado'] = null;
-      $exito = $ambProducto->alta($data);
+    if (!$ambProducto->buscar(['pronombre' => $datosProd['pronombre']])) {
+      $datosProd['prodeshabilitado'] = null;
+      $exito = $ambProducto->alta($datosProd);
     } else {
-      $exito = 'Ya existe un producto con este nombre';
+      $exito = 3;
     }
     return $exito;
   }
 
-  function guardarImagenes($idPro) {
+  private function guardarImagenes($idPro) {
+    $exito = true;
     if ($_FILES['imagen']['name'][0] != '') {
 
-      $dir = '../View/img/Productos/' . md5($idPro) . '/'; // carpeta para guardar imagen
+      $dir = '../../View/img/Productos/' . md5($idPro) . '/'; // carpeta para guardar imagen
 
       if (!file_exists($dir)) {
         mkdir($dir, 0777, true);
@@ -54,13 +54,65 @@ class NuevoProductoControl {
       while ($i < count($_FILES['imagen']['name'])) {
         if ($_FILES['imagen']['error'][$i] <= 0) {
           if (!copy($_FILES['imagen']['tmp_name'][$i], $dir . $_FILES['imagen']['name'][$i])) {
-            echo "ERROR: no se pudo cargar la imagen";
+            $exito = 4;
           }
         } else {
-          echo "ERROR: no se pudo cargar La imagen. No se pudo acceder al imagen temporal";
+          $exito = 5;
         }
         $i++;
       }
     }
+    return $exito;
+  }
+
+  public function productoActual($data) {
+    $ambProducto = new AbmProducto();
+    $producto = $ambProducto->buscar(['idproducto' => $data['id']]);
+    return (count($producto) > 0) ? $producto[0] : null;
+  }
+
+  public function imagenesProducto($data) {
+    $dirImg = md5($data["id"]);
+    return scandir("img/Productos/" . $dirImg);
+  }
+
+  public function mensajes($num) {
+    $mensajes = [
+      0 => 'Acción realizada con exito',
+      2 => 'Este producto no existe',
+      3 => 'Ya existe un producto con este nombre',
+      4 => 'ERROR: no se pudo cargar la imagen',
+      5 => 'ERROR: No se pudo acceder al imagen temporal',
+      6 => 'Los datos del producto son incorrectos'
+    ];
+    return $mensajes[$num];
+  }
+
+  public function tienePermiso() {
+    $accesoPag = new ctrolPagina();
+    return $accesoPag->ctrl_acceso();
+  }
+
+  public function proDetalles($producto) {
+    return json_decode($producto->getProDetalle(), true);
+  }
+
+  public function accion($data) {
+    $datosProd = $this->procesarDatos($data);
+    $ambProducto = new AbmProducto();
+
+    if ($datosProd) {
+      $exito = (isset($datosProd['idproducto'])) ? $this->modificarProducto($datosProd) : $this->agregarProducto($datosProd);
+    } else {
+      $exito = 6;
+    }
+
+    if (isset($datosProd['pronombre'])) {
+      $producto = $ambProducto->buscar(['pronombre' => $datosProd['pronombre']])[0];
+
+      $this->guardarImagenes($producto->getIdProducto());
+    }
+
+    return $exito;
   }
 }

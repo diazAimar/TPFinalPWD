@@ -4,17 +4,15 @@
 include_once 'includes/head.php';
 include_once 'includes/navbar.php';
 
-$control = new ListarProductosControl();
+$control = new EstadoProductoControl();
 $productos = $control->listar();
-$accesoPag = new ctrolPagina;
-$access = $accesoPag->ctrl_acceso();
 
 ?>
 
 
 <div class="container d-flex justify-content-center align-items-start text-center mt-5">
 
-  <?php /*if ($sesion->activa() && $sesion->getRolActual() == 2)*/ if ($access) { ?>
+  <?php if ($sesion->activa() && $sesion->getRolActual() == 2) { ?>
 
     <?php if (count($productos) > 0) { ?>
       <table class="table caption-top">
@@ -38,14 +36,12 @@ $access = $accesoPag->ctrl_acceso();
           <?php $productos = ordenarArregloProductos($productos); ?>
 
           <?php foreach ($productos as $producto) {
-            $textoDeshab = ($producto->getProDeshabilitado()) ? "class=\"text-black-50\"" : "";
-            $fotoDeshab = ($producto->getProDeshabilitado()) ? "class=\"img-baja\"" : "";
-            $modelo = (isset(json_decode($producto->getProDetalle(), true)['marca'])) ? json_decode($producto->getProDetalle(), true)['marca'] : 'Sin marca';
+            $textoDeshab = $control->textoDeshab($producto);
+            $fotoDeshab = $control->fotoDeshab($producto);
+            $modelo = $control->getModelo($producto);
+
             $dirImg = md5($producto->getIdProducto());
             $img = scandir($ROOT . "view/img/Productos/" . $dirImg)[2];
-
-            
-
           ?>
 
             <tr>
@@ -69,9 +65,9 @@ $access = $accesoPag->ctrl_acceso();
 
               <td>
                 <?php if (!$producto->getProDeshabilitado()) { ?>
-                  <a class="btn btn-danger mt-3" title="Dar de baja" href="../Controller/estadoProductoMod.php?id=<?= $producto->getIdProducto() ?>&v=1" role="button"><i class="fas fa-trash-alt"></i></a>
+                  <a class="btn btn-danger mt-3" title="Dar de baja" href="accion/estadoProductoAccion.php?id=<?= $producto->getIdProducto() ?>" role="button"><i class="fas fa-trash-alt"></i></a>
                 <?php } else { ?>
-                  <a class="btn btn-warning mt-3" title="Reactivar" href="../Controller/estadoProductoMod.php?id=<?= $producto->getIdProducto() ?>&v=1" role="button"><i class="fas fa-redo"></i></a>
+                  <a class="btn btn-warning mt-3" title="Reactivar" href="accion/estadoProductoAccion.php?id=<?= $producto->getIdProducto() ?>" role="button"><i class="fas fa-redo"></i></a>
                 <?php } ?>
               </td>
 

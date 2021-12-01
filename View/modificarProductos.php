@@ -42,14 +42,14 @@ $productos = $control->listar();
                 $modelo = json_decode($producto->getProDetalle(), true)['marca'];
               } else $modelo = "";
               $dirImg = md5($producto->getIdProducto());
-              $img = scandir($ROOT . "view/img/Productos/" . $dirImg)[2];
+              $img = scandir($ROOT . "View/img/Productos/" . $dirImg);
 
           ?>
 
               <tr>
 
                 <td>
-                  <img style="max-height:70px" src="<?= "./img/Productos/{$dirImg}/{$img}" ?>">
+                  <img style="max-height:70px" src="./img/Productos/<?= (isset($img[2])) ? "{$dirImg}/{$img[2]}" : "producto-sin-imagen.png" ;  ?>">
                 </td>
                 <td>
                   <p class="mt-4"><?= $modelo ?></p>

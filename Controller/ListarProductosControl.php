@@ -6,4 +6,4 @@ class ListarProductosControl {
     $abmProducto = new AbmProducto();
     return $abmProducto->buscar(null);
   }
-}
+}//sacar

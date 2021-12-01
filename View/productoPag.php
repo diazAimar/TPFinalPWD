@@ -3,13 +3,11 @@ include_once '../config.php';
 
 $data = data_submitted();
 
-if (array_key_exists("nombrecel", $data)) {
-  $title =  $data["nombrecel"];
-} else $title = "Celular";
-include_once './includes/head.php'; ?>
-<?php include_once "./includes/navbar.php"; ?>
+$title = (array_key_exists("nombrecel", $data)) ? $data["nombrecel"] : "Celular";
 
-<?php
+include_once './includes/head.php';
+include_once "./includes/navbar.php";
+
 $controlProducto = new AbmProducto();
 
 
@@ -87,7 +85,7 @@ if (array_key_exists("id", $data) && $data["id"] != null) {
               <?php if ($producto[0]->getProCantStock() > 0) { ?>
                 <form action="carritoCompra.php" method="POST">
                   <input type="number" class="hide" value="<?= $producto[0]->getIdProducto(); ?>" name="idproducto">
-                  <button type="submit" <?php if (!isset($_SESSION["idusuario"])){ ?> disabled <?php } ?> class="btn btn-primary mt-4">Agregar al Carrito</button>
+                  <button type="submit" <?php if (!isset($_SESSION["idusuario"])) { ?> disabled <?php } ?> class="btn btn-primary mt-4">Agregar al Carrito</button>
                 </form>
               <?php } ?>
               <hr>
@@ -161,8 +159,8 @@ if (array_key_exists("id", $data) && $data["id"] != null) {
   </div>
 
 
-<?php } else {
-  echo "<p class='container fs-3 mt-5'>No se encontro el celular buscado.</p>";
-} ?>
+<?php } else { ?>
+  <p class='container fs-3 mt-5'>No se encontro el celular buscado.</p>
+<?php } ?>
 
 <?php include_once "./includes/footer.php"; ?>

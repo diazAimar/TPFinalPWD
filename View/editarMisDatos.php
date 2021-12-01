@@ -2,22 +2,16 @@
 
 <?php $title = 'Actualizar Datos de Usuario';
 include_once 'includes/head.php' ?>
-<?php include_once 'includes/navbar.php'?>
+<?php include_once 'includes/navbar.php' ?>
 
 <?php
-// mostrarArray($_SESSION);
-// mostrarArray($sesion);
 if ($sesion->activa()) {
 
   $controlAL = new EditarDatosClienteControl();
   $usuario = $sesion->getObjUsuario();
-  // var_dump($usuario);
   $rolesDisponibles = $controlAL->rolesDisponibles();
-  // mostrarArray($rolesDisponibles);
   $usuarioRoles = $usuario->getColRoles();
   echo "<br>";
-  // mostrarArray($usuarioRoles);
-
 }
 ?>
 
@@ -102,31 +96,7 @@ if ($sesion->activa()) {
 
     </form>
 
-  <?php } else { ?>
-
-
-    <div class="text-center mt-5">
-      <a class='btn btn-primary' href="listarUsuario.php" role='button'>Ver lista de usuarios</a>
-    </div>
   <?php } ?>
-
-
-  <script>
-    function togglePass() {
-      var elements = document.getElementsByClassName("pass-input");
-
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-        element.classList.toggle("d-none");
-      }
-
-      var buttonPri = document.getElementById("pass-button-principal");
-      var buttonSec = document.getElementById("pass-button-secundario");
-      buttonPri.classList.toggle("d-none");
-      buttonSec.classList.toggle("d-none");
-
-    }
-  </script>
 
 <?php } else { ?>
   <div class="container d-flex justify-content-center align-items-start text-center mt-5">

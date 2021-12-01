@@ -1,14 +1,13 @@
-<?php include_once "../config.php" ?>
+<?php include_once "../config.php";
 
-<?php $title = 'Lista de Usuarios';
-include_once 'includes/head.php' ?>
-<?php include_once 'includes/navbar.php' ?>
+$title = 'Lista de Usuarios';
+include_once 'includes/head.php';
+include_once 'includes/navbar.php';
 
-<?php
-$controlLU = new ListarUsuariosControl();
-$controlLU->altaBajaUsuario();
-$listaUsuarios = $controlLU->listar();
-$usuarioEsRol = $controlLU->esRol();
+$control = new ListarUsuariosControl();
+$control->altaBajaUsuario();
+$listaUsuarios = $control->listar();
+$usuarioEsRol = $control->esRol();
 ?>
 
 
@@ -36,7 +35,7 @@ $usuarioEsRol = $controlLU->esRol();
 
 
             <?php $textoDeshab = ($objUsuario->getUsDeshabilitado()) ? "class=\"text-black-50\"" : ""; ?>
-            <?php $rolesUsuarioActual = $controlLU->printRoles($objUsuario) ?>
+            <?php $rolesUsuarioActual = $control->printRoles($objUsuario) ?>
 
             <?php
             $bgcUsuario = "";

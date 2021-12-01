@@ -1,8 +1,10 @@
-<?php include_once "../config.php" ?>
+<?php include_once "../config.php";
 
-<?php $title = 'Login';
-include_once 'includes/head.php' ?>
-<?php include_once 'includes/navbar.php' ?>
+$title = 'Login';
+include_once 'includes/head.php';
+include_once 'includes/navbar.php';
+$data = data_submitted();
+?>
 
 <div class="container d-flex justify-content-center align-items-start text-center mt-20vh">
   <div class="text-center mx-auto" style="max-width:300px">
@@ -10,7 +12,7 @@ include_once 'includes/head.php' ?>
     <img class="mb-4" src="img\logo.png" alt="logo" width="72" height="72">
     <h1 class="h3 mb-3 font-weight-normal">Iniciar sesión</h1>
 
-    <form class="needs-validation" data-toggle="loginValidator" id="form-login" novalidate action="../Controller/loginAccion.php" method="post">
+    <form class="needs-validation" data-toggle="loginValidator" id="form-login" novalidate action="accion/loginAccion.php" method="post">
       <div class="form-group">
         <div class="input-group">
           <div class="input-group-prepend">
@@ -38,19 +40,19 @@ include_once 'includes/head.php' ?>
 </div>
 
 <?php
-if (array_key_exists("error", $_GET) && $_GET["error"] == 1) {
+if (array_key_exists("error", $data) && $data["error"] == 1) {
   echo "<div class='alert alert-danger w-25 mx-auto d-flex justify-content-center align-items-center  mt-5' role='alert'>
         Usuario y/o contraseña incorrectos.
       </div>";
 } ?>
 <?php
-if (array_key_exists("error", $_GET) && $_GET["error"] == 2) {
+if (array_key_exists("error", $data) && $data["error"] == 2) {
   echo "<div class='alert alert-danger w-25 mx-auto d-flex justify-content-center align-items-center  mt-5' role='alert'>
         El usuario se encuentra dado de baja.
       </div>";
 } ?>
 <?php
-if (array_key_exists("error", $_GET) && $_GET["error"] == 3) {
+if (array_key_exists("error", $data) && $data["error"] == 3) {
   echo "<div class='alert alert-danger w-25 mx-auto d-flex justify-content-center align-items-center  mt-5' role='alert'>
         Usuario no tiene rol asignado.
       </div>";

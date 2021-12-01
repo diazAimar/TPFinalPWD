@@ -1,13 +1,12 @@
-<?php include_once "../config.php" ?>
+<?php include_once "../config.php";
 
-<?php
 $control = new EditarDatosClienteControl();
 $errores = $control->modificar();
-?>
 
-<?php $title = 'Actualizar Datos de Usuario';
-include_once 'includes/head.php' ?>
-<?php include_once 'includes/navbar.php' ?>
+$title = 'Actualizar Datos de Usuario';
+include_once 'includes/head.php';
+include_once 'includes/navbar.php';
+?>
 
 
 <div class="container text-center mt-20vh w-50">
